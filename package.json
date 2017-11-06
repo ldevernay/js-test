@@ -14,7 +14,8 @@
     "jailed-node": "^0.4.1",
     "lodash": "^4.12.0",
     "mustache": "^2.2.1",
-    "node-static": "^0.7.9"
+    "node-static": "^0.7.9",
+    "nodemon": "^1.12.1"
   },
   "devDependencies": {},
   "scripts": {

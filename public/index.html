@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="generator" content="Polymer Starter Kit" />
   <title>JavaScript Test</title>
-  
+
   <link rel="manifest" href="manifest.json">
 
   <meta name="theme-color" content="#2E3AA1"> <!-- Chrome for Android theme color -->
@@ -70,145 +70,130 @@
       </paper-toolbar>
 
       <div class="content">
-        
+
         <section>
           <paper-material elevation="1">
-            <template is="dom-if" if="{{!loggedIn}}">
-              <h2>Connexion</h2>
-              <p>{{config.LOGIN_INVITE}}</p>
+            <template is="dom-if" if="{{myAnswers._submitted}}">
+              <zero-md text="{{mdSubmitted}}">
+                <!-- Remember to pass in empty container of class="md-html". -->
+                <div class="md-html"></div>
+              </zero-md>
+              <!--
+              <p>Votre copie a bien été rendue. Merci !</p>
+            -->
+            <template is="dom-if" if="{{myAnswers._d}}">
+              <p>Date/heure de rendu: {{myAnswers._d}}</p>
             </template>
-            <template is="dom-if" if="{{loggedIn}}">
-              <h2>Bonjour, {{user.name}}</h2>
-
-              <template is="dom-if" if="{{myAnswers._submitted}}">
-                <zero-md text="{{mdSubmitted}}">
-                  <!-- Remember to pass in empty container of class="md-html". -->
-                  <div class="md-html"></div>
-                </zero-md>
-                <!--
-                <p>Votre copie a bien été rendue. Merci !</p>
-                -->
-                <template is="dom-if" if="{{myAnswers._d}}">
-                  <p>Date/heure de rendu: {{myAnswers._d}}</p>
-                </template>
-                <template is="dom-if" if="{{myAnswers._score}}">
-                  <p class="total-points">Note obtenue: {{myAnswers._score}} / {{myAnswers._maxScore}}</p>
-                </template>
-              </template>
-
-              <template is="dom-if" if="{{!myAnswers._submitted}}">
-                <zero-md file="./data/intro.md">
-                  <!-- Remember to pass in empty container of class="md-html". -->
-                  <div class="md-html"></div>
-                </zero-md>
-              </template>
-
+            <template is="dom-if" if="{{myAnswers._score}}">
+              <p class="total-points">Note obtenue: {{myAnswers._score}} / {{myAnswers._maxScore}}</p>
             </template>
-            <google-signin
-              is-authorized="{{loggedIn}}"
-              scopes="profile email"
-              hosted-domain="{{config.GOOGLE_CLIENT_DOMAIN}}"
-              client-id="{{config.GOOGLE_CLIENT_ID}}"
-            ></google-signin>
-          </paper-material>
-        </section>
+          </template>
 
-        <template is="dom-if" if="{{loggedIn}}">
-          <template is="dom-if" if="[[showQuestions(myAnswers)]]">
+          <template is="dom-if" if="{{!myAnswers._submitted}}">
+            <zero-md file="./data/intro.md">
+              <!-- Remember to pass in empty container of class="md-html". -->
+              <div class="md-html"></div>
+            </zero-md>
+          </template>
+        </paper-material>
+      </section>
 
-            <template is="dom-if" if="{{!active}}">
-              <paper-material elevation="1">
-                <p>Le test est fermé pour l'instant. Suivez les consignes de votre enseignant.</p>
-              </paper-material>
-            </template>
+      <template is="dom-if" if="{{loggedIn}}">
+        <template is="dom-if" if="[[showQuestions(myAnswers)]]">
 
-            <template is="dom-if" if="{{active}}">
-              <template is="dom-repeat" items="{{exercises}}" as="exercise">
+          <template is="dom-if" if="{{!active}}">
+            <paper-material elevation="1">
+              <p>Le test est fermé pour l'instant. Suivez les consignes de votre enseignant.</p>
+            </paper-material>
+          </template>
 
-                <section id="[[exercise.id]]" class="quizz-question">
-                  <paper-material elevation="1">
+          <template is="dom-if" if="{{active}}">
+            <template is="dom-repeat" items="{{exercises}}" as="exercise">
 
-                    <h2>{{exercise.title}}</h2>
-                    <template is="dom-repeat" items="{{exercise.questions}}" as="question">
-                      <section id="[[question.id]]" class="quizz-question">
-                        <paper-material elevation="0">
-                          <h3>Question {{question.i}}
-                            <template is="dom-if" if="[[myPoints(myAnswers, question.id)]]">
-                              <span class="question-points">
-                                ([[myPoints(myAnswers, question.id)]])
-                              </span>
-                            </template>
-                          </h3>
-                          <paper-spinner-lite active></paper-spinner-lite>
+              <section id="[[exercise.id]]" class="quizz-question">
+                <paper-material elevation="1">
 
-                          <zero-md text="{{question.md}}" file="{{question.mdFile}}">
-                            <!-- Remember to pass in empty container of class="md-html". -->
-                            <div class="md-html"></div>
-                          </zero-md>
-
-                          <template is="dom-if" if="{{exercise.isQuizz}}">
-                            <my-qcm data-id$="[[question.id]]" on-answer="onChange" items="{{question.choices}}" value="[[myAnswersItem(myAnswers.*, question.id)]]"></my-qcm>
+                  <h2>{{exercise.title}}</h2>
+                  <template is="dom-repeat" items="{{exercise.questions}}" as="question">
+                    <section id="[[question.id]]" class="quizz-question">
+                      <paper-material elevation="0">
+                        <h3>Question {{question.i}}
+                          <template is="dom-if" if="[[myPoints(myAnswers, question.id)]]">
+                            <span class="question-points">
+                              ([[myPoints(myAnswers, question.id)]])
+                            </span>
                           </template>
+                        </h3>
+                        <paper-spinner-lite active></paper-spinner-lite>
 
-                          <template is="dom-if" if="{{exercise.isCode}}">
-                            <my-code label="Saisissez votre code Javascript ici" on-blur="onCodeBlur" data-id$="[[question.id]]" value="[[myAnswersItem(myAnswers.*, question.id)]]"></my-code> <!-- on-change="onCodeChange" -->
-                            <!--
-                            <paper-button id="btnSubmit_{{question.id}}" data-id$="[[question.id]]" on-click="onSubmit" disabled raised>
-                              <iron-icon icon="check"></iron-icon>&nbsp;
-                              <span>Enregistrer</span>
-                            </paper-button>
-                            -->
-                          </template>
+                        <zero-md text="{{question.md}}" file="{{question.mdFile}}">
+                          <!-- Remember to pass in empty container of class="md-html". -->
+                          <div class="md-html"></div>
+                        </zero-md>
 
-                          <template is="dom-if" if="[[showSolutions(myAnswers)]]">
-                            <zero-md class="solution" text="{{question.mdSolution}}" file="{{question.mdSolutionFile}}">
-                              <!-- Remember to pass in empty container of class="md-html". -->
-                              <div class="md-html"></div>
-                            </zero-md>
-                          </template>
+                        <template is="dom-if" if="{{exercise.isQuizz}}">
+                          <my-qcm data-id$="[[question.id]]" on-answer="onChange" items="{{question.choices}}" value="[[myAnswersItem(myAnswers.*, question.id)]]"></my-qcm>
+                        </template>
 
-                        </paper-material>
-                      </section>
+                        <template is="dom-if" if="{{exercise.isCode}}">
+                          <my-code label="Saisissez votre code Javascript ici" on-blur="onCodeBlur" data-id$="[[question.id]]" value="[[myAnswersItem(myAnswers.*, question.id)]]"></my-code> <!-- on-change="onCodeChange" -->
+                          <!--
+                          <paper-button id="btnSubmit_{{question.id}}" data-id$="[[question.id]]" on-click="onSubmit" disabled raised>
+                          <iron-icon icon="check"></iron-icon>&nbsp;
+                          <span>Enregistrer</span>
+                        </paper-button>
+                      -->
+                    </template>
+
+                    <template is="dom-if" if="[[showSolutions(myAnswers)]]">
+                      <zero-md class="solution" text="{{question.mdSolution}}" file="{{question.mdSolutionFile}}">
+                        <!-- Remember to pass in empty container of class="md-html". -->
+                        <div class="md-html"></div>
+                      </zero-md>
                     </template>
 
                   </paper-material>
                 </section>
               </template>
 
-              <template is="dom-if" if="{{!myAnswers._submitted}}">
-                <section>
-                  <paper-material elevation="1">
-                    <h2>Rendu de copie</h2>
-                    <zero-md file="./data/rendu.md">
-                      <!-- Remember to pass in empty container of class="md-html". -->
-                      <div class="md-html"></div>
-                    </zero-md>
-                    <paper-button id="btnSubmitExam" on-click="onSubmitExam" raised class="green">
-                      <iron-icon icon="check"></iron-icon>&nbsp;
-                      <span>Rendre la copie</span>
-                    </paper-button>
-                  </paper-material>
-                </section>
-              </template>
-
-            </template>
-          </template>
+            </paper-material>
+          </section>
         </template>
 
-      </div>
-    </paper-scroll-header-panel>
+        <template is="dom-if" if="{{!myAnswers._submitted}}">
+          <section>
+            <paper-material elevation="1">
+              <h2>Rendu de copie</h2>
+              <zero-md file="./data/rendu.md">
+                <!-- Remember to pass in empty container of class="md-html". -->
+                <div class="md-html"></div>
+              </zero-md>
+              <paper-button id="btnSubmitExam" on-click="onSubmitExam" raised class="green">
+                <iron-icon icon="check"></iron-icon>&nbsp;
+                <span>Rendre la copie</span>
+              </paper-button>
+            </paper-material>
+          </section>
+        </template>
 
-    <paper-toast id="toast">
-      <span class="toast-hide-button" role="button" tabindex="0" onclick="app.$.toast.hide()">Ok</span>
-    </paper-toast>
-
+      </template>
+    </template>
   </template>
 
-  <script src="scripts/exam-data.js"></script> <!-- TODO: make sure latest version is loaded -->
+</div>
+</paper-scroll-header-panel>
 
-  <!-- build:js scripts/app.js -->
-  <script src="scripts/app.js"></script>
-  <!-- endbuild-->
+<paper-toast id="toast">
+  <span class="toast-hide-button" role="button" tabindex="0" onclick="app.$.toast.hide()">Ok</span>
+</paper-toast>
+
+</template>
+
+<script src="scripts/exam-data.js"></script> <!-- TODO: make sure latest version is loaded -->
+
+<!-- build:js scripts/app.js -->
+<script src="scripts/app.js"></script>
+<!-- endbuild-->
 
 </body>
 
